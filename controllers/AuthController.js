@@ -39,7 +39,8 @@ class AuthController {
     }
     // delete token from database
     await redisClient.del(`auth_${token}`);
-    res.status(204).json({});
+    res.status(204).send();
+    return;
   }
 }
 

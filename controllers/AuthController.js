@@ -37,6 +37,7 @@ class AuthController {
       res.status(401).json({ error: 'Unauthorized' });
     } else {
       // delete token from database
+      await redisClient.del(`auth_${token}`);
       res.status(204).send();
     }
   }

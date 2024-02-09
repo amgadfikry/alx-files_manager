@@ -36,6 +36,9 @@ class UsersController {
   static async getMe(req, res) {
     // retrieve token and get paired userId with it from redis
     const token = req.headers['x-token'];
+    if (!token) {
+      res.status(401).json({ error: 'Unauthorized' });
+    }
     const userId = await redisClient.get(`auth_${token}`);
     if (!userId) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -43,6 +46,9 @@ class UsersController {
     }
     // retrive user from userId
     const user = await dbClient.findOne('users', { _id: ObjectID(userId) });
+    if (!user) {
+      res.status(401).json({ error: 'Unauthorized' });
+    }
     res.status(200).json({ id: userId, email: user.email });
   }
 }

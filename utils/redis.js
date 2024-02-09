@@ -15,7 +15,7 @@ class RedisClient {
       this.connection = true;
     });
     this.getAsync = promisify(this.client.get).bind(this.client);
-    this.setexAsync = promisify(this.client.setex).bind(this.client);
+    this.setAsync = promisify(this.client.set).bind(this.client);
     this.delAsync = promisify(this.client.del).bind(this.client);
   }
 
@@ -32,7 +32,7 @@ class RedisClient {
 
   // set new key, value pair in database with specific TTL async way
   async set(key, value, duration) {
-    await this.setexAsync(key, duration, value);
+    await this.setAsync(key, value, 'EX', duration);
   }
 
   // delete provided key from database in async way

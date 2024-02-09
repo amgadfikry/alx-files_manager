@@ -29,7 +29,7 @@ class UsersController {
     const data = { email, password: hashedPassword };
     // add new user to database
     const addedUser = await dbClient.addNew('users', data);
-    res.json({ id: addedUser.insertedId, email });
+    res.status(201).json({ id: addedUser.insertedId, email });
   }
 
   // method that retrieve user data based on token

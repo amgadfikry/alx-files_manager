@@ -8,14 +8,18 @@ class AuthController {
   // method that check if user if exist in data and generate tokens for it
   static async getConnect(req, res) {
     // check if there is authorization in request
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers.authorization || null;
     if (!authHeader) {
-      res.status(401).json({ error: 'Missing authorization in headers' });
+      res.status(401).json({ error: 'Unauthorized' });
       return;
     }
     // decode authorization header and extract email and password from it
     const decodedDetails = Buffer.from(authHeader.split(' ')[1], 'base64').toString();
     const [email, password] = decodedDetails.split(':');
+    if (!email || !password) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
     // check if user exist or not in database
     const user = await dbClient.findOne('users', { email, password: sha1(password) });
     if (!user) {
@@ -31,7 +35,7 @@ class AuthController {
   // disconnect the user from database redis and remove it's token
   static async getDisconnect(req, res) {
     // retrieve token and get paired userId with it from redis
-    const token = req.headers['x-token'];
+    const token = req.headers['x-token'] || null;
     if (!token) {
       res.status(401).json({ error: 'Unauthorized' });
     }

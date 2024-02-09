@@ -35,7 +35,7 @@ class UsersController {
   // method that retrieve user data based on token
   static async getMe(req, res) {
     // retrieve token and get paired userId with it from redis
-    const token = req.headers['x-token'];
+    const token = req.headers['x-token'] || null;
     if (!token) {
       res.status(401).json({ error: 'Unauthorized' });
     }

@@ -43,7 +43,7 @@ class UsersController {
     }
     // retrive user from userId
     const user = await dbClient.findOne('users', { _id: ObjectID(userId) });
-    res.status(200).json({ email: user.email, id: user.id.toString() });
+    res.status(200).json({ id: userId, email: user.email });
   }
 }
 

@@ -5,8 +5,15 @@ import { promisify } from 'util';
 class RedisClient {
   // start class with instance with start connection without ant error
   constructor() {
-    this.client = createClient()
-      .on('error', (err) => console.log(`Redis client error: ${err}`));
+    this.client = createClient();
+    this.connection = true;
+    this.client.on('error', (err) => {
+      console.log(`Redis client error: ${err}`);
+      this.connection = false;
+    });
+    this.client.on('connect', () => {
+      this.connection = true;
+    });
     this.getAsync = promisify(this.client.get).bind(this.client);
     this.setexAsync = promisify(this.client.setex).bind(this.client);
     this.delAsync = promisify(this.client.del).bind(this.client);
@@ -14,12 +21,7 @@ class RedisClient {
 
   // method that check if connection with redis is still stablish
   isAlive() {
-    try {
-      this.client.ping();
-      return true;
-    } catch (err) {
-      return false;
-    }
+    return this.connection;
   }
 
   // get vaue of provided key async way from database

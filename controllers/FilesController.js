@@ -154,6 +154,9 @@ class FilesController {
       if ('error' in user) {
         return res.status(404).json({ error: 'Not found' });
       }
+      if (user.id !== fileDocument.userId.toString()) {
+        return res.status(404).json({ error: 'Not found' });
+      }
     }
     if (fileDocument.type === 'folder') {
       return res.status(400).json({ error: "A folder doesn't have content" });

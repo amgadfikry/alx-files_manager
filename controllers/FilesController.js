@@ -74,11 +74,14 @@ class FilesController {
       return res.status(401).json(user);
     }
     const documentId = req.params.id;
+    console.log(documentId);
     const searchCritria = { userId: user.id, _id: ObjectID(documentId) };
+    console.log(searchCritria);
     const fileDocument = await dbClient.findOne('files', searchCritria);
+    console.log(fileDocument);
     if (!fileDocument) return res.status(404).json({ error: 'Not found' });
-    delete fileDocument._id
-    delete fileDocument.localPath
+    fileDocument.id = fileDocument._id.toString();
+    console.log(fileDocument);
     return res.status(200).json(fileDocument);
   }
 

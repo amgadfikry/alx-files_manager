@@ -87,8 +87,8 @@ class FilesController {
     const fileDocument = await dbClient.findOne('files', searchCritria);
     if (!fileDocument) return res.status(404).json({ error: 'Not found' });
     return res.status(200).json({
-      id: fileDocument._id.toString(),
-      userId: fileDocument.userId.toString(),
+      id: documentId,
+      userId: user.id,
       name: fileDocument.name,
       type: fileDocument.type,
       isPublic: fileDocument.isPublic,
@@ -103,7 +103,7 @@ class FilesController {
       return res.status(401).json(user);
     }
     const { parentId = 0, page = 0 } = req.query;
-    const searchCritria = { userId: user.id, parentId };
+    const searchCritria = { parentId: parentId === 0 ? 0 : ObjectID(parentId) };
     const documentList = await dbClient.paginationFiles(searchCritria, page, 20);
     return res.status(200).json(documentList);
   }

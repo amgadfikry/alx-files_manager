@@ -68,7 +68,6 @@ class FilesController {
 
     fileDetails = { ...fileDetails, localPath };
     const addedFile = await dbClient.addNew('files', fileDetails);
-    console.log(fileDetails);
     return res.status(201).json({
       userId, name, type, isPublic, parentId, localPath, id: addedFile.insertedId,
     });

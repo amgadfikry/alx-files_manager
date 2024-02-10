@@ -29,4 +29,10 @@ router.post('/users', UsersController.postNew);
 // route to add new file, image, folder to database and local
 router.post('/files', FilesController.postUpload);
 
+// all put routes on app server
+// route update document to make it public
+router.put('/files/:id/publish', FilesController.putPublish);
+// route update document to make it unpublic
+router.put('/files/:id/unpublish', FilesController.putUnpublish);
+
 export default router;

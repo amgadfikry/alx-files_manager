@@ -3,6 +3,7 @@ import fs from 'fs';
 import { v4 } from 'uuid';
 import dbClient from '../utils/db';
 import authToken from '../utils/authToken';
+import updatePublish from '../utils/updatePublish';
 
 // class contain all functionality of routes manage files process
 class FilesController {
@@ -116,6 +117,26 @@ class FilesController {
         parentId: li.parentId.toString(),
       });
     });
+    return res.status(200).json(result);
+  }
+
+  // method that update document to make it public
+  static async putPublish(req, res) {
+    const result = await updatePublish(req, res, true);
+    if ('error' in result) {
+      if (result.error === 'Unauthorized') return res.status(401).json(result);
+      return res.status(404).json(result);
+    }
+    return res.status(200).json(result);
+  }
+
+  // method that update document to make it unpublic
+  static async putUnpublish(req, res) {
+    const result = await updatePublish(req, res, false);
+    if ('error' in result) {
+      if (result.error === 'Unauthorized') return res.status(401).json(result);
+      return res.status(404).json(result);
+    }
     return res.status(200).json(result);
   }
 }

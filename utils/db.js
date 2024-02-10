@@ -50,6 +50,11 @@ class DBClient {
     ];
     return this.db.collection('files').aggregate(pipline).toArray();
   }
+
+  // update document accord to filter critria
+  async updateDocument(filter, data) {
+    return this.db.collection('files').updateOne(filter, data);
+  }
 }
 
 // create new instance of class and export it

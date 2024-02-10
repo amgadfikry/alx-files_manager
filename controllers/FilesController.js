@@ -74,17 +74,15 @@ class FilesController {
       return res.status(401).json(user);
     }
     const documentId = req.params.id;
-    console.log(documentId);
-    const searchCritria = { userId: user.id, _id: ObjectID(documentId) };
-    console.log(searchCritria);
-    const fileDocument = await dbClient.findOne('files', searchCritria);
-    console.log(fileDocument);
-    if (!fileDocument) return res.status(404).json({ error: 'Not found' });
-    fileDocument.id = fileDocument._id.toString();
-    delete fileDocument.localPath;
-    delete fileDocument._id;
-    console.log(fileDocument);
-    return res.status(200).json(fileDocument);
+    if (!documentId) return res.status(404).json({ error: 'Not found' });
+    try {
+      const searchCritria = { userId: user.id, _id: ObjectID(documentId) };
+      const fileDocument = await dbClient.findOne('files', searchCritria);
+      if (!fileDocument) return res.status(404).json({ error: 'Not found' });
+      return res.status(200).json(fileDocument);
+    } catch (err) {
+      return res.status(404).json({ error: 'Not found' });
+    }
   }
 
   // method that paginate through document related specific folder and user

@@ -13,6 +13,7 @@ class FilesController {
       return res.status(401).json(user);
     }
     const userId = user.id;
+
     // retrieve data from request body
     const {
       name,
@@ -21,6 +22,7 @@ class FilesController {
       isPublic = false,
       data = null,
     } = req.body;
+
     // check all possible error prevent from create new file
     if (!name) {
       return res.status(400).json({ error: 'Missing name' });
@@ -40,9 +42,14 @@ class FilesController {
         return res.status(400).json({ error: 'Parent is not a folder' });
       }
     }
+
     // create data of file and if it's folder save it to database
     let fileDetails = {
-      userId, name, type, isPublic, parentId,
+      userId: ObjectID(userId),
+      name,
+      type,
+      isPublic,
+      parentId: parentId === 0 ? 0 : ObjectID(parentId),
     };
     if (type === 'folder') {
       const addedFolder = await dbClient.addNew('files', fileDetails);
@@ -50,6 +57,7 @@ class FilesController {
         userId, name, type, isPublic, parentId, id: addedFolder.insertedId,
       });
     }
+
     // if it's file or image save it locally through provided path or default one
     const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
     const fileNameLocally = v4();
@@ -59,6 +67,7 @@ class FilesController {
         const fileContent = Buffer.from(data, 'base64').toString();
         return fs.promises.writeFile(localPath, fileContent);
       });
+
     // and save it on database
     fileDetails = { ...fileDetails, localPath };
     const addedFile = await dbClient.addNew('files', fileDetails);
@@ -74,15 +83,10 @@ class FilesController {
       return res.status(401).json(user);
     }
     const documentId = req.params.id;
-    if (!documentId) return res.status(404).json({ error: 'Not found' });
-    try {
-      const searchCritria = { userId: user.id, _id: ObjectID(documentId) };
-      const fileDocument = await dbClient.findOne('files', searchCritria);
-      if (!fileDocument) return res.status(404).json({ error: 'Not found' });
-      return res.status(200).json(fileDocument);
-    } catch (err) {
-      return res.status(404).json({ error: 'Not found' });
-    }
+    const searchCritria = { userId: user.id, _id: ObjectID(documentId) };
+    const fileDocument = await dbClient.findOne('files', searchCritria);
+    if (!fileDocument) return res.status(404).json({ error: 'Not found' });
+    return res.status(200).json(fileDocument);
   }
 
   // method that paginate through document related specific folder and user
@@ -92,12 +96,8 @@ class FilesController {
       return res.status(401).json(user);
     }
     const { parentId = 0, page = 0 } = req.query;
-    if (page < 0) return res.status(401).json({ error: 'No negative page number' });
-    console.log(parentId, page);
     const searchCritria = { userId: user.id, parentId };
-    console.log(searchCritria);
     const documentList = await dbClient.paginationFiles(searchCritria, page, 20);
-    console.log(documentList);
     return res.status(200).json(documentList);
   }
 }

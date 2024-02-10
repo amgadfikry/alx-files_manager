@@ -151,7 +151,7 @@ class FilesController {
       return res.status(404).json({ error: 'Not found' });
     }
     if (!fileDocument.isPublic) {
-      if (!user || 'error' in user || ObjectID(user.id) !== fileDocument.userId) {
+      if ('error' in user) {
         return res.status(404).json({ error: 'Not found' });
       }
     }

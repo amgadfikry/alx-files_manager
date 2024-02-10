@@ -81,6 +81,8 @@ class FilesController {
     console.log(fileDocument);
     if (!fileDocument) return res.status(404).json({ error: 'Not found' });
     fileDocument.id = fileDocument._id.toString();
+    delete fileDocument.localPath;
+    delete fileDocument._id;
     console.log(fileDocument);
     return res.status(200).json(fileDocument);
   }

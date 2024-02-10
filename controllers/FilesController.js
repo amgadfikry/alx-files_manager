@@ -83,10 +83,17 @@ class FilesController {
       return res.status(401).json(user);
     }
     const documentId = req.params.id;
-    const searchCritria = { userId: user.id, _id: ObjectID(documentId) };
+    const searchCritria = { userId: ObjectID(user.id), _id: ObjectID(documentId) };
     const fileDocument = await dbClient.findOne('files', searchCritria);
     if (!fileDocument) return res.status(404).json({ error: 'Not found' });
-    return res.status(200).json(fileDocument);
+    return res.status(200).json({
+      id: fileDocument._id.toString(),
+      userId: fileDocument.userId.toString(),
+      name: fileDocument.name,
+      type: fileDocument.type,
+      isPublic: fileDocument.isPublic,
+      parentId: fileDocument.parentId.toString(),
+    });
   }
 
   // method that paginate through document related specific folder and user

@@ -1,6 +1,7 @@
 import { ObjectID } from 'mongodb';
 import fs from 'fs';
 import { v4 } from 'uuid';
+import mime from 'mime-types';
 import dbClient from '../utils/db';
 import authToken from '../utils/authToken';
 import updatePublish from '../utils/updatePublish';
@@ -138,6 +139,34 @@ class FilesController {
       return res.status(404).json(result);
     }
     return res.status(200).json(result);
+  }
+
+  // method that get content of file accord it's id provided
+  static async getFile(req, res) {
+    const user = await authToken(req, res);
+    const documentId = req.params.id;
+    const searchCritria = { _id: ObjectID(documentId) };
+    const fileDocument = await dbClient.findOne('files', searchCritria);
+    if (!fileDocument) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    if (!fileDocument.isPublic) {
+      if ('error' in user || ObjectID(user.id) === fileDocument.userId) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+    }
+    if (fileDocument.type === 'folder') {
+      return res.status(400).json({ error: "A folder doesn't have content" });
+    }
+    try {
+      await fs.promises.access(fileDocument.localPath);
+      const content = await fs.promises.readFile(fileDocument.localPath, 'utf-8');
+      const mimeType = mime.lookup(fileDocument.localPath);
+      res.setHeader('Content-Type', mimeType);
+      return res.end(content);
+    } catch (err) {
+      return res.status(404).json({ error: 'Not found' });
+    }
   }
 }
 

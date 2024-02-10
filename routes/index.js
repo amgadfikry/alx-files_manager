@@ -22,6 +22,8 @@ router.get('/users/me', UsersController.getMe);
 router.get('/files/:id', FilesController.getShow);
 // route paginate through all document or in specific folder related to specific user
 router.get('/files', FilesController.getIndex);
+// route get data of document
+router.get('/files/:id/data', FilesController.getFile);
 
 // all post routes on app server
 // route to add new user to database

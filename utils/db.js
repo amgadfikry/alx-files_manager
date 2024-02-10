@@ -40,6 +40,16 @@ class DBClient {
   async addNew(coll, data) {
     return this.db.collection(coll).insertOne(data);
   }
+
+  // paginate through files with specific critria, page number zero index, and page size
+  async paginationFiles(critria, page, pageSize) {
+    const pipline = [
+      { $match: critria },
+      { $skip: (page * pageSize) },
+      { $limit: pageSize },
+    ];
+    return this.db.collection('files').aggregate(pipline).toArray();
+  }
 }
 
 // create new instance of class and export it

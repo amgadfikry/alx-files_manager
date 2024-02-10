@@ -18,6 +18,10 @@ router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
 // route get user data based on token provided
 router.get('/users/me', UsersController.getMe);
+// route get specific document related to user and document id
+router.get('/files/:id', FilesController.getShow);
+// route paginate through all document or in specific folder related to specific user
+router.get('/files', FilesController.getIndex);
 
 // all post routes on app server
 // route to add new user to database

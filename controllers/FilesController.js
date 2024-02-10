@@ -67,12 +67,29 @@ class FilesController {
     });
   }
 
+  // method that show specific file with provided id and token of user
   static async getShow(req, res) {
-    res.json();
+    const user = await authToken(req, res);
+    if ('error' in user) {
+      return res.status(401).json(user);
+    }
+    const documentId = req.params.id;
+    const searchCritria = { userId: user.id, _id: ObjectID(documentId) };
+    const fileDocument = await dbClient.findOne('files', searchCritria);
+    if (!fileDocument) return res.status(404).json({ error: 'Not found' });
+    return res.status(200).json(fileDocument);
   }
 
+  // method that paginate through document related specific folder and user
   static async getIndex(req, res) {
-    res.json();
+    const user = await authToken(req, res);
+    if ('error' in user) {
+      return res.status(401).json(user);
+    }
+    const { parentId = 0, page = 0 } = req.query;
+    const searchCritria = { userId: user.id, parentId };
+    const documentList = await dbClient.paginationFiles(searchCritria, page, 20);
+    return res.status(200).json(documentList);
   }
 }
 

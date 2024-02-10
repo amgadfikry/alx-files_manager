@@ -103,7 +103,7 @@ class FilesController {
       return res.status(401).json(user);
     }
     const { parentId = 0, page = 0 } = req.query;
-    const searchCritria = { parentId: parentId === 0 ? 0 : ObjectID(parentId) };
+    const searchCritria = parentId === 0 ? {} : { parentId: ObjectID(parentId) };
     const documentList = await dbClient.paginationFiles(searchCritria, page, 20);
     const result = [];
     documentList.forEach((li) => {

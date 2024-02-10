@@ -92,8 +92,12 @@ class FilesController {
       return res.status(401).json(user);
     }
     const { parentId = 0, page = 0 } = req.query;
+    if (page < 0) return res.status(401).json({ error: 'No negative page number' });
+    console.log(parentId, page);
     const searchCritria = { userId: user.id, parentId };
+    console.log(searchCritria);
     const documentList = await dbClient.paginationFiles(searchCritria, page, 20);
+    console.log(documentList);
     return res.status(200).json(documentList);
   }
 }

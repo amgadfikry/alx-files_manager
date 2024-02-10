@@ -1,7 +1,6 @@
 import sha1 from 'sha1';
-import { ObjectID } from 'mongodb';
 import dbClient from '../utils/db';
-import redisClient from '../utils/redis';
+import authToken from '../utils/authToken';
 
 // class contain all functionality of routes manage users
 class UsersController {
@@ -35,21 +34,11 @@ class UsersController {
   // method that retrieve user data based on token
   static async getMe(req, res) {
     // retrieve token and get paired userId with it from redis
-    const token = req.headers['x-token'] || null;
-    if (!token) {
-      res.status(401).json({ error: 'Unauthorized' });
+    const user = await authToken(req, res);
+    if ('error' in user) {
+      return res.status(401).json(user);
     }
-    const userId = await redisClient.get(`auth_${token}`);
-    if (!userId) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-    // retrive user from userId
-    const user = await dbClient.findOne('users', { _id: ObjectID(userId) });
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
-    res.status(200).json({ id: userId, email: user.email });
+    return res.status(200).json(user);
   }
 }
 

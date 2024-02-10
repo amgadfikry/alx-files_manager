@@ -2,24 +2,17 @@ import { ObjectID } from 'mongodb';
 import fs from 'fs';
 import { v4 } from 'uuid';
 import dbClient from '../utils/db';
-import redisClient from '../utils/redis';
+import authToken from '../utils/authToken';
 
 // class contain all functionality of routes manage files process
 class FilesController {
   static async postUpload(req, res) {
     // retain user document by token provided in request
-    const token = req.headers['x-token'] || null;
-    if (!token) {
-      res.status(401).json({ error: 'Unauthorized' });
+    const user = await authToken(req, res);
+    if ('error' in user) {
+      return res.status(401).json(user);
     }
-    const userId = await redisClient.get(`auth_${token}`);
-    if (!userId) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
-    const user = await dbClient.findOne('users', { _id: ObjectID(userId) });
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
+    const userId = user.id;
     // retrieve data from request body
     const {
       name,
@@ -72,6 +65,14 @@ class FilesController {
     return res.status(201).json({
       userId, name, type, isPublic, parentId, localPath, id: addedFile.insertedId,
     });
+  }
+
+  static async getShow(req, res) {
+    res.json();
+  }
+
+  static async getIndex(req, res) {
+    res.json();
   }
 }
 
